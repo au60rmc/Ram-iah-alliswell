@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Community Events Notice Board</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+margin:0;
+}
+
+header{
+background:#020617;
+padding:15px;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+position:sticky;
+top:0;
+z-index:100;
+box-shadow:0 4px 10px rgba(0,0,0,0.6);
+}
+
+#datetime{
+font-size:14px;
+color:#38bdf8;
+margin-top:5px;
+}
+
+.container{
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+/* Notice Board */
+
+.notice-card{
+flex:3;
+background:#1e293b;
+border-radius:12px;
+padding:20px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
+overflow:hidden;
+}
+
+.notice-title{
+font-size:22px;
+margin-bottom:10px;
+color:#38bdf8;
+}
+
+.table-container{
+height:300px;
+overflow:hidden;
+position:relative;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #334155;
+text-align:left;
+}
+
+th{
+color:#38bdf8;
+}
+
+tr:hover{
+background:#334155;
+}
+
+/* Scroll animation */
+
+.scroll{
+position:absolute;
+width:100%;
+animation:scrollUp 20s linear infinite;
+}
+
+@keyframes scrollUp{
+0%{transform:translateY(0);}
+100%{transform:translateY(-50%);}
+}
+
+/* Sidebar */
+
+.sidebar{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.ad-card{
+background:#1e293b;
+padding:10px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,0.6);
+text-align:center;
+}
+
+.ad-card img{
+width:100%;
+border-radius:10px;
+}
+
+.ad-card iframe{
+width:100%;
+border-radius:10px;
+}
+
+footer{
+text-align:center;
+padding:10px;
+background:#020617;
+font-size:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+Community Events Notice Board
+<div id="datetime"></div>
+</header>
+
+<div class="container">
+
+<div class="notice-card">
+
+<div class="notice-title">Upcoming Events</div>
+
+<div class="table-container">
+
+<div class="scroll">
+
+<table id="eventTable">
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Event</th>
+<th>Time</th>
+<th>Details</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Advertisement Sidebar -->
+
+<div class="sidebar">
+
+<div class="ad-card">
+<h4>Local Shop Offer</h4>
+<img src="https://via.placeholder.com/300x200">
+</div>
+
+<div class="ad-card">
+<h4>Community Video</h4>
+<iframe height="200"
+src="https://www.youtube.com/embed/tgbNymZ7vqY"
+frameborder="0"
+allowfullscreen>
+</iframe>
+</div>
+
+</div>
+
+</div>
+
+<footer>
+Community Information Center
+</footer>
+
+
+<script>
+
+/* Google Sheet CSV URL */
+
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPTiGUbnzKeOzK-NxCj4DpsQN9S9szcXyjNFH-Q16I2iB7YZd3HKaOVl5t7Ikxn7Mad32giRBn81vo/pub?output=csv";
+
+/* Fetch Events */
+
+fetch(sheetURL)
+.then(res => res.text())
+.then(data => {
+
+let rows = data.split("\n").slice(1);
+let table = document.querySelector("#eventTable tbody");
+
+rows.forEach(row=>{
+
+let cols = row.split(",");
+let tr=document.createElement("tr");
+
+cols.forEach(col=>{
+let td=document.createElement("td");
+td.innerText=col;
+tr.appendChild(td);
+});
+
+table.appendChild(tr);
+
+});
+
+});
+
+/* Date Time */
+
+function updateClock(){
+
+let now=new Date();
+
+document.getElementById("datetime").innerHTML=
+now.toLocaleDateString()+" | "+now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+</script>
+
+</body>
+</html>
