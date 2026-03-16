@@ -21,7 +21,6 @@ font-size:24px;
 font-weight:bold;
 position:sticky;
 top:0;
-z-index:100;
 box-shadow:0 4px 10px rgba(0,0,0,0.6);
 }
 
@@ -37,7 +36,7 @@ gap:20px;
 padding:20px;
 }
 
-/* Notice Board */
+/* NOTICE BOARD */
 
 .notice-card{
 flex:3;
@@ -55,7 +54,7 @@ color:#38bdf8;
 }
 
 .table-container{
-height:300px;
+height:320px;
 overflow:hidden;
 position:relative;
 }
@@ -79,12 +78,12 @@ tr:hover{
 background:#334155;
 }
 
-/* Scroll animation */
+/* SCROLLING TABLE */
 
 .scroll{
 position:absolute;
 width:100%;
-animation:scrollUp 20s linear infinite;
+animation:scrollUp 25s linear infinite;
 }
 
 @keyframes scrollUp{
@@ -92,31 +91,39 @@ animation:scrollUp 20s linear infinite;
 100%{transform:translateY(-50%);}
 }
 
-/* Sidebar */
+/* SIDEBAR */
 
 .sidebar{
 flex:1;
-display:flex;
-flex-direction:column;
-gap:20px;
 }
 
-.ad-card{
+.ad-slider{
 background:#1e293b;
-padding:10px;
 border-radius:12px;
-box-shadow:0 0 15px rgba(0,0,0,0.6);
-text-align:center;
+overflow:hidden;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
+height:320px;
+position:relative;
 }
 
-.ad-card img{
+.ad-slide{
+position:absolute;
 width:100%;
-border-radius:10px;
+height:100%;
+opacity:0;
+transform:translateY(30px);
+transition:all 1s ease;
 }
 
-.ad-card iframe{
+.ad-slide.active{
+opacity:1;
+transform:translateY(0);
+}
+
+.ad-slide img{
 width:100%;
-border-radius:10px;
+height:100%;
+object-fit:cover;
 }
 
 footer{
@@ -124,6 +131,7 @@ text-align:center;
 padding:10px;
 background:#020617;
 font-size:12px;
+margin-top:10px;
 }
 
 </style>
@@ -146,7 +154,7 @@ Community Events Notice Board
 
 <div class="scroll">
 
-<table id="eventTable">
+<table id="notice-table">
 
 <thead>
 <tr>
@@ -167,24 +175,26 @@ Community Events Notice Board
 
 </div>
 
-
-<!-- Advertisement Sidebar -->
-
 <div class="sidebar">
 
-<div class="ad-card">
-<h4>Local Shop Offer</h4>
-<img src="https://images.unsplash.com/photo-1773539649767-98dc585833fa?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
-<img src="https://scontent.fpny2-1.fna.fbcdn.net/v/t39.30808-6/605535390_1320054240147099_8083346770978765936_n.png?stp=dst-jpg_tt6&_nc_cat=110&ccb=1-7&_nc_sid=b895b5&_nc_ohc=0sRUgCz7TJ0Q7kNvwFyji2i&_nc_oc=Adlk34KYZ87y8kO5Yq6L0lgl0669V6QaZ3G9Nl_cu16HjOETTiiCmbwllxrreNvLHes&_nc_zt=23&_nc_ht=scontent.fpny2-1.fna&_nc_gid=beqKBfLj5D53t0p3Q8T8oQ&_nc_ss=8&oh=00_AfyYNdxFjF4smBKGfVvgsQlwXYm1ZLRlrtmFU5odys__iw&oe=69BD8FDF">  
+<div class="ad-slider" id="adSlider">
+
+<div class="ad-slide active">
+<img src="https://source.unsplash.com/400x400/?community">
 </div>
 
-<div class="ad-card">
-<h4>Community Video</h4>
-<iframe height="200"
-src="https://www.youtube.com/shorts/thuMEADPcv8?feature=share"
-frameborder="0"
-allowfullscreen>
-</iframe>
+<div class="ad-slide">
+<img src="https://source.unsplash.com/400x400/?festival">
+</div>
+
+<div class="ad-slide">
+<img src="https://source.unsplash.com/400x400/?temple">
+</div>
+
+<div class="ad-slide">
+<img src="https://source.unsplash.com/400x400/?celebration">
+</div>
+
 </div>
 
 </div>
@@ -195,51 +205,73 @@ allowfullscreen>
 Community Information Center
 </footer>
 
-
 <script>
 
-/* Google Sheet CSV URL */
+/* CSV FILE URL */
 
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPTiGUbnzKeOzK-NxCj4DpsQN9S9szcXyjNFH-Q16I2iB7YZd3HKaOVl5t7Ikxn7Mad32giRBn81vo/pub?output=csv";
+const csvURL = "events.csv";
 
-/* Fetch Events */
+/* FETCH CSV */
 
-fetch(sheetURL)
-.then(res => res.text())
+fetch(csvURL)
+.then(response => response.text())
 .then(data => {
 
-let rows = data.split("\n").slice(1);
-let table = document.querySelector("#eventTable tbody");
+const rows = data.trim().split("\n").slice(1);
+const tableBody = document.querySelector("#notice-table tbody");
 
-rows.forEach(row=>{
+rows.forEach(row => {
 
-let cols = row.split(",");
-let tr=document.createElement("tr");
+const cols = row.split(",");
+const tr = document.createElement("tr");
 
-cols.forEach(col=>{
-let td=document.createElement("td");
-td.innerText=col;
+cols.forEach(col => {
+
+const td = document.createElement("td");
+td.textContent = col.trim();
 tr.appendChild(td);
-});
-
-table.appendChild(tr);
 
 });
 
+tableBody.appendChild(tr);
+
 });
 
-/* Date Time */
+});
+
+/* CLOCK */
 
 function updateClock(){
 
-let now=new Date();
+let now = new Date();
 
-document.getElementById("datetime").innerHTML=
-now.toLocaleDateString()+" | "+now.toLocaleTimeString();
+document.getElementById("datetime").innerHTML =
+now.toLocaleDateString() + " | " + now.toLocaleTimeString();
 
 }
 
 setInterval(updateClock,1000);
+
+/* AD SLIDER */
+
+let slides = document.querySelectorAll(".ad-slide");
+let index = 0;
+
+function showSlide(){
+
+slides.forEach(slide => slide.classList.remove("active"));
+
+index++;
+
+if(index >= slides.length){
+index = 0;
+}
+
+slides[index].classList.add("active");
+
+}
+
+setInterval(showSlide,4000);
 
 </script>
 
